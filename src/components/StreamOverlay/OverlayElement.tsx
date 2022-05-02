@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import FreeTransform from 'react-free-transform'
-import useOnClickOutside from 'hooks/useOnClickOutside';
+import useOnElementClick from 'hooks/useOnElementClick';
 
 import styles from './OverlayElement.module.scss'
 
@@ -19,18 +19,18 @@ export interface OverlayElementProps {
 }
 
 const OverlayElement = (props: OverlayElementProps) => {
-
+  const [isFocused, setIsFocused] = useState(false);
   const contentDiv = useRef(null)
   const handleClickOutside = useCallback(() => {
+    setIsFocused(false);
+  }, [])
+  const handleClickInside = useCallback(() => {
+    setIsFocused(true);
   }, [])
 
-  const focused = useOnClickOutside(contentDiv, handleClickOutside);
+  useOnElementClick(contentDiv, handleClickOutside, handleClickInside);
 
-  useEffect(() => {
-    console.log(focused);
-  }, [focused]);
-
-  return <div className={`${styles.OverlayElement}`} ref={contentDiv}>
+  return <div className={`${styles.OverlayElement} ${isFocused && styles.Focused}`} ref={contentDiv}>
     <FreeTransform
       {...props}
       onUpdate={(payload: any) => { if (props.onUpdate) props.onUpdate(props.id, payload) }}

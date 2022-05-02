@@ -1,4 +1,13 @@
 .OverlayElement {
+  :global(.tr-transform__controls) {
+    display: none;
+    z-index: 9;
+  }
+  &.Focused {
+    :global(.tr-transform__controls) {
+      display: block;
+    }
+  }
   :global(.tr-transform__rotator) {
     top: -45px;
     left: calc(50% - 7px);
