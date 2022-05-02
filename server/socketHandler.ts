@@ -4,8 +4,8 @@ const SocketHandler = (io: SocketIOServer) => {
   io.on("connection", (socket: Socket) => {
     console.log("connection");
 
-    socket.on("message", (msg) => {
-      socket.broadcast.emit("message", msg);
+    socket.on("elementTransform", (data) => {
+      socket.broadcast.emit("elementTransform", data);
     });
 
     socket.on("disconnect", () => {
