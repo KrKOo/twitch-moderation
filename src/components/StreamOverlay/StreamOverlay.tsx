@@ -19,6 +19,29 @@ interface StreamOverlayProps {
   backgroundImage?: string;
 }
 
+interface Scale {
+  x: number;
+  y: number;
+}
+
+const getRelativeTransformation = (element: RelativeOverlayElementProps, scale: Scale) => {
+  return ({
+    relativeWidth: element.width * element.scaleX * scale.x,
+    relativeHeight: element.height * element.scaleY * scale.y,
+    relativeX: element.x * scale.x,
+    relativeY: element.y * scale.y,
+  })
+}
+
+const getAbsoluteTransofmation = (element: RelativeOverlayElementProps, scale: Scale) => {
+  return ({
+    width: element.relativeWidth / (element.scaleX * scale.x),
+    height: element.relativeHeight / (element.scaleY * scale.y),
+    x: element.relativeX / scale.x,
+    y: element.relativeY / scale.y,
+  })
+}
+
 const StreamOverlay = (props: StreamOverlayProps) => {
   const initialElements = [
     {
@@ -50,37 +73,19 @@ const StreamOverlay = (props: StreamOverlayProps) => {
 
   const socket = useSocket();
 
-  const getRelativeTransformation = (element: RelativeOverlayElementProps) => {
-    return ({
-      relativeWidth: element.width * element.scaleX * scale.x,
-      relativeHeight: element.height * element.scaleY * scale.y,
-      relativeX: element.x * scale.x,
-      relativeY: element.y * scale.y,
-    })
-  }
-
-  const getAbsoluteTransofmation = useCallback((element: RelativeOverlayElementProps) => {
-    return ({
-      width: element.relativeWidth / (element.scaleX * scale.x),
-      height: element.relativeHeight / (element.scaleY * scale.y),
-      x: element.relativeX / scale.x,
-      y: element.relativeY / scale.y,
-    })
-  }, [scale.x, scale.y])
-
   const handleSocketConnect = () => {
     console.log("connected");
   }
 
   const handleSocketTransform = useCallback((data: RelativeOverlayElementProps) => {
-    const index = elementsNoRenderRef.current.findIndex((item: RelativeOverlayElementProps) => item.id === data.id);
+    const index = elementsNoRenderRef.current.findIndex((element: RelativeOverlayElementProps) => element.id === data.id);
     if (index !== -1) {
-      setElements(prevItems => {
-        prevItems[index] = { ...data, ...getAbsoluteTransofmation(data) }
-        return [...prevItems]
+      setElements(prevElements => {
+        prevElements[index] = { ...data, ...getAbsoluteTransofmation(data, scale) }
+        return [...prevElements]
       });
     }
-  }, [elementsNoRenderRef, getAbsoluteTransofmation])
+  }, [elementsNoRenderRef, scale])
 
   // Initialize the socket
   useEffect(() => {
@@ -106,11 +111,8 @@ const StreamOverlay = (props: StreamOverlayProps) => {
   useEffect(() => {
     setElements((prevElements) => {
       const newElements = prevElements.map((element) => {
-        element.width = element.relativeWidth / (element.scaleX * scale.x);
-        element.height = element.relativeHeight / (element.scaleY * scale.y);
-        element.x = element.relativeX / scale.x;
-        element.y = element.relativeY / scale.y;
-        return element;
+        element = { ...element, ...getAbsoluteTransofmation(element, scale) }
+        return element
       })
       return newElements;
     })
@@ -124,7 +126,7 @@ const StreamOverlay = (props: StreamOverlayProps) => {
           ...element,
           ...payload
         };
-        newElement = { ...newElement, ...getRelativeTransformation(newElement) }
+        newElement = { ...newElement, ...getRelativeTransformation(newElement, scale) }
         socket.emit('elementTransform', newElement);
         return newElement;
       }
