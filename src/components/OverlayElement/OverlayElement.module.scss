@@ -1,4 +1,6 @@
 .OverlayElement {
+  overflow: hidden;
+
   :global(.tr-transform__controls) {
     display: none;
     z-index: 9;

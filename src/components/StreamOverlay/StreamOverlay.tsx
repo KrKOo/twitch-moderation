@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 
 import { useNoRenderRef } from "hooks/useNoRenderRef";
 import { useWindowSize } from "hooks/useWindowSize";
-import OverlayElement, { OverlayElementProps } from './OverlayElement';
+import OverlayElement, { OverlayElementProps } from 'components/OverlayElement/OverlayElement';
 
 import styles from './StreamOverlay.module.scss';
 import { useSocket } from "hooks/useSocket";
@@ -14,7 +14,12 @@ interface RelativeOverlayElementProps extends OverlayElementProps {
   relativeY: number;
 }
 
-const StreamOverlay = () => {
+interface StreamOverlayProps {
+  className?: string;
+  backgroundImage?: string;
+}
+
+const StreamOverlay = (props: StreamOverlayProps) => {
   const initialElements = [
     {
       id: 1,
@@ -120,14 +125,15 @@ const StreamOverlay = () => {
           ...payload
         };
         newElement = { ...newElement, ...getRelativeTransformation(newElement) }
-        socket.emit('elementTransform', newElement)
+        socket.emit('elementTransform', newElement);
         return newElement;
       }
+      return element;
     })
     setElements(newElements);
   }
 
-  return <div ref={overlayRef} className={styles.StreamOverlay} style={{ width: '100vw', height: '100vh' }}>
+  return <div ref={overlayRef} className={`${styles.StreamOverlay} ${props.className || ''}`}>
     {elements.map((element) => {
       return <OverlayElement
         key={element.id}
@@ -135,6 +141,9 @@ const StreamOverlay = () => {
         {...element}
       />
     })}
+
+    {/* eslint-disable-next-line @next/next/no-img-element */}
+    {props.backgroundImage && <img id={styles.thumbnail} src={props.backgroundImage} alt='thumbnail' />}
   </div >
 };
 

@@ -1,12 +1,13 @@
 .StreamOverlay {
+  user-select: none;
+  aspect-ratio: 16/9;
   position: relative;
   overflow: hidden;
-  width: auto;
-  height: auto;
-  // #thumbnail {
-  //   width: 100%;
-  //   height: auto;
-  //   position: relative;
-  //   z-index: -1;
-  // }
+
+  #thumbnail {
+    width: 100%;
+    height: auto;
+    position: relative;
+    z-index: -1;
+  }
 }

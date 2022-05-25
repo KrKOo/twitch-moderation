@@ -1,0 +1,15 @@
+.overlayControlContainer {
+  width: 100vw;
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+  padding: 0;
+
+  .OverlayMenu {
+    width: 40px;
+  }
+
+  .StreamOverlay {
+    width: 100%;
+  }
+}
