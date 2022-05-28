@@ -4,8 +4,7 @@ import useOnElementClick from 'hooks/useOnElementClick';
 
 import styles from './OverlayElement.module.scss'
 
-export interface OverlayElementProps {
-  id: number;
+export interface OverlayElementTransform {
   x: number;
   y: number;
   width: number;
@@ -13,9 +12,18 @@ export interface OverlayElementProps {
   scaleX: number;
   scaleY: number;
   angle: number;
-  offsetX: number;
-  offsetY: number;
-  onUpdate?: (id: number, payload: any) => void;
+}
+
+export interface OverlayElementProps extends OverlayElementTransform {
+  id: number;
+  style?: React.CSSProperties;
+  isImage: boolean;
+  value?: string;
+
+  offsetX?: number;
+  offsetY?: number;
+  onUpdate?: (payload: any) => void;
+  children?: React.ReactChild;
 }
 
 const OverlayElement = (props: OverlayElementProps) => {
@@ -30,12 +38,24 @@ const OverlayElement = (props: OverlayElementProps) => {
 
   useOnElementClick(contentDiv, handleClickOutside, handleClickInside);
 
+  let content = props.children;
+  if (props.isImage) {
+    {/* eslint-disable-next-line @next/next/no-img-element */ }
+    content = <img src={props.value} alt="" />
+  }
+  else if (!content) {
+    content = <div style={props.style}>{props.value}</div>
+  }
+
   return <div className={`${styles.OverlayElement} ${isFocused && styles.Focused}`} ref={contentDiv}>
     <FreeTransform
       {...props}
-      onUpdate={(payload: any) => { if (props.onUpdate) props.onUpdate(props.id, payload) }}
+      disableScale={true}
+      onUpdate={(payload: Partial<OverlayElementTransform>) => { if (props.onUpdate) props.onUpdate(payload) }}
     >
-      <div style={{ background: 'red', width: props.width, height: props.height }}></div>
+      <div className={styles.OverlayElementContent}>
+        {content}
+      </div>
     </FreeTransform >
   </div>
 }

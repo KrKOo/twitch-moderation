@@ -1,4 +1,5 @@
 import StreamOverlay from "components/StreamOverlay/StreamOverlay"
+import { DasboardContextProvider } from "contexts/dashboardContext"
 import { SocketProvider } from "contexts/socketContext"
 
 import styles from 'styles/Dashboard.module.scss'
@@ -6,7 +7,9 @@ import styles from 'styles/Dashboard.module.scss'
 export default function Dashboard() {
   return (
     <SocketProvider>
-      <StreamOverlay className={styles.StreamOverlay} />
+      <DasboardContextProvider>
+        <StreamOverlay className={styles.StreamOverlay} />
+      </DasboardContextProvider>
     </SocketProvider>
   )
 }
